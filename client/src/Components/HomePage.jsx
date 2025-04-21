@@ -5,7 +5,6 @@ import {
   Row,
   Col,
   Card,
-  Button,
   Form,
   Carousel,
 } from "react-bootstrap";
@@ -138,13 +137,11 @@ const staticProducts = [
     image: "https://via.placeholder.com/200x150?text=Jeans",
   },
 ];
-
-// Define brand-category mapping
 const categoryBrandMapping = {
   Smartphones: ["Apple", "Samsung", "OnePlus"],
   Audio: ["Sony", "boAt", "JBL"],
   Laptops: ["Dell", "HP", "Lenovo"],
-  Fruits: ["Fresh", "Organic", "Hybrid"], // No brands for fruits
+  Fruits: ["Fresh", "Organic", "Hybrid"],
   Chairs: ["IKEA", "Home Center", "Urban Ladder"],
   Clothes: ["Levi's", "Wrangler", "Puma"],
 };
@@ -163,29 +160,18 @@ const HomePage = () => {
   }, [search, selectedCategory, selectedBrands, priceRange]);
 
   const applyFilters = () => {
-    let filtered = staticProducts.filter((product) => {
-      const matchName = product.name
-        .toLowerCase()
-        .includes(search.toLowerCase());
-      const matchCategory = selectedCategory
-        ? product.category === selectedCategory
-        : true;
-      const matchBrand =
-        selectedCategory === "Fruits" // Skip brand filter for fruits category
-          ? true
-          : selectedBrands.length > 0
-          ? selectedBrands.includes(product.brand)
-          : true;
-      const matchPrice =
-        product.price >= priceRange[0] && product.price <= priceRange[1];
+    let filteredProducts = staticProducts.filter((product) => {
+      const matchName = product.name.toLowerCase().includes(search.toLowerCase());
+      const matchCategory = selectedCategory ? product.category === selectedCategory : true;
+      const matchBrand = selectedCategory === "Fruits" ? true : selectedBrands.length > 0 ? selectedBrands.includes(product.brand) : true;
+      const matchPrice = product.price >= priceRange[0] && product.price <= priceRange[1];
 
       return matchName && matchCategory && matchBrand && matchPrice;
     });
 
-    setFiltered(filtered);
+    setFiltered(filteredProducts);
   };
 
-  // Group products by category
   const groupedByCategory = filtered.reduce((acc, product) => {
     if (!acc[product.category]) {
       acc[product.category] = [];
@@ -194,7 +180,6 @@ const HomePage = () => {
     return acc;
   }, {});
 
-  // Get the number of items to show based on the screen size
   const getCarouselItemsPerRow = () => {
     if (window.innerWidth < 576) return 1; // Mobile
     if (window.innerWidth < 768) return 2; // Tablet
@@ -236,9 +221,7 @@ const HomePage = () => {
                 value: brand,
               }))}
               placeholder="Select Brands"
-              onChange={(selected) =>
-                setSelectedBrands(selected.map((b) => b.value))
-              }
+              onChange={(selected) => setSelectedBrands(selected.map((b) => b.value))}
             />
           )}
         </Col>
@@ -257,9 +240,7 @@ const HomePage = () => {
             max={200000}
             step={500}
             value={priceRange[0]}
-            onChange={(e) =>
-              setPriceRange([Number(e.target.value), priceRange[1]])
-            }
+            onChange={(e) => setPriceRange([Number(e.target.value), priceRange[1]])}
           />
           <input
             type="range"
@@ -268,9 +249,7 @@ const HomePage = () => {
             max={200000}
             step={500}
             value={priceRange[1]}
-            onChange={(e) =>
-              setPriceRange([priceRange[0], Number(e.target.value)])
-            }
+            onChange={(e) => setPriceRange([priceRange[0], Number(e.target.value)])}
           />
         </Col>
       </Row>
@@ -287,7 +266,7 @@ const HomePage = () => {
           >
             <Carousel.Item>
               <Row>
-                {groupedByCategory[category].map((item, index) => (
+                {groupedByCategory[category].map((item) => (
                   <Col key={item.id} md={getCarouselItemsPerRow()}>
                     <Card>
                       <Card.Img variant="top" src={item.image} />

@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { useLocation } from "react-router-dom";
 
 const UserDashboard = () => {
+  const [location,setLocation] = useState(useLocation().pathname);
   const [products, setProducts] = useState([]);
   const [filtered, setFiltered] = useState([]);
   const [search, setSearch] = useState("");
@@ -65,13 +67,17 @@ const UserDashboard = () => {
       {/* Search & Filters */}
       <div className="row g-3 mb-4">
         <div className="col-md-4">
-          <input
-            type="text"
-            className="form-control"
-            placeholder="Search by name..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
+          {/* Conditionally render search input based on location */}
+          {location !== "/admin" && (
+            <input
+              type="text"
+              id="global-search"
+              className="form-control"
+              placeholder="Search by name..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          )}
         </div>
         <div className="col-md-2">
           <input

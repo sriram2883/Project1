@@ -1,34 +1,31 @@
 import React, { useEffect, useState } from "react";
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  Link,
-  Navigate,
-} from "react-router-dom";
+import { Link, Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { Container, Navbar, Nav, Button, Form } from "react-bootstrap";
 import Login from "./Components/Login";
 import HomePage from "./Components/HomePage";
 import AdminDashboard from "./Components/AdminDashboard";
-import { Container, Navbar, Nav, Button, Form } from "react-bootstrap";
 
 function App() {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(null); // Default is null
   const [search, setSearch] = useState("");
 
+  // Get the user from localStorage on initial render
   useEffect(() => {
     const savedUser = JSON.parse(localStorage.getItem("user"));
     if (savedUser) {
-      setUser(savedUser);
+      setUser(savedUser); // Update user state if there is a saved user
     }
   }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("user");
-    setUser(null);
+    setUser(null); // Clear user state on logout
   };
 
+  const location = useLocation(); // useLocation() is valid here as App is inside Router
+
   return (
-    <Router>
+    <div>
       <Navbar bg="dark" variant="dark" expand="lg" className="px-4 sticky-top">
         <Navbar.Brand as={Link} to="/">
           🛍️ ShopEase
@@ -39,21 +36,26 @@ function App() {
             <Nav.Link as={Link} to="/">
               Home
             </Nav.Link>
-            {user?.role === "admin" && (
+            {user?.role === "Admin" && (  // Check if user is admin
               <Nav.Link as={Link} to="/admin">
-                Admin
+                Admin Portal
               </Nav.Link>
             )}
           </Nav>
-          <Form className="d-flex me-3" onSubmit={(e) => e.preventDefault()}>
-            <Form.Control
-              type="search"
-              placeholder="Search"
-              className="me-2"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-          </Form>
+
+          {/* Conditionally render search bar based on location */}
+          {location.pathname === "/" && (
+            <Form className="d-flex me-3" onSubmit={(e) => e.preventDefault()}>
+              <Form.Control
+                type="search"
+                placeholder="Search"
+                className="me-2"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+            </Form>
+          )}
+
           <Nav>
             {user ? (
               <Button variant="outline-light" onClick={handleLogout}>
@@ -78,12 +80,12 @@ function App() {
           <Route
             path="/admin"
             element={
-              user?.role === "admin" ? <AdminDashboard /> : <Navigate to="/" />
+              user?.role === "Admin" ? <AdminDashboard /> : <Navigate to="/" />
             }
           />
         </Routes>
       </Container>
-    </Router>
+    </div>
   );
 }
 

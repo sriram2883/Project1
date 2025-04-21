@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const API_BASE = "https://localhost:5001/api/auth"; // Change as needed
 
-const Login = () => {
+const Login = ({ setUser }) => {
   const [isLogin, setIsLogin] = useState(true);
   const [form, setForm] = useState({
     username: "",
@@ -12,6 +13,7 @@ const Login = () => {
     role: "User",
   });
   const [message, setMessage] = useState("");
+  const navigate = useNavigate();
 
   const toggleForm = () => {
     setIsLogin(!isLogin);
@@ -31,19 +33,34 @@ const Login = () => {
       return;
     }
 
-    const endpoint = isLogin ? "/login" : "/register";
+    const fakeUsers = [
+      { username: "admin123", password: "admin@123", role: "Admin" },
+      { username: "user123", password: "user@123", role: "User" },
+    ];
 
-    try {
-      const res = await axios.post(`${API_BASE}${endpoint}`, form);
-      setMessage(isLogin ? "✅ Login successful!" : "✅ Signup successful!");
+    if (isLogin) {
+      const foundUser = fakeUsers.find(
+        (u) =>
+          u.username === form.username &&
+          u.password === form.password &&
+          u.role === form.role
+      );
 
-      if (isLogin) {
-        localStorage.setItem("token", res.data.token);
-        localStorage.setItem("role", form.role);
-        // Navigate or reload here
+      if (foundUser) {
+        const user = {
+          username: foundUser.username,
+          role: foundUser.role,
+        };
+
+        localStorage.setItem("user", JSON.stringify(user));
+        setMessage("✅ Login successful!");
+        setUser(user);
+        navigate("/"); // Redirect to homepage after login
+      } else {
+        setMessage("❌ Invalid credentials");
       }
-    } catch (err) {
-      setMessage("❌ " + (err.response?.data || "Something went wrong!"));
+    } else {
+      setMessage("✅ Signup successful (static mode)");
     }
   };
 
